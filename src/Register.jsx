@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import { auth, googleProvider } from "./firebase";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 export default function Register() {
   const formRef = useRef(null);
@@ -27,9 +29,15 @@ export default function Register() {
                 alert("Passwords do not match");
                 return;
               }
-              // placeholder: replace with real register logic (Firebase)
-              // on success redirect to dashboard
-              window.location.hash = "dashboard";
+              // Firebase register
+              createUserWithEmailAndPassword(auth, data.email, data.password)
+                .then((userCredential) => {
+                  // user created
+                  window.location.hash = "dashboard";
+                })
+                .catch((error) => {
+                  alert(error.message || "Registration failed");
+                });
             }}
           >
             <div className="input-style no-borders has-icon validate-field mb-4">
@@ -139,12 +147,17 @@ export default function Register() {
           <div className="divider"></div>
           <div className="text-center">
             <a
-              href="#dashboard"
+              href="#"
               className="btn btn-icon text-start btn-full btn-l font-600 font-13 bg-google rounded-s"
               onClick={(e) => {
                 e.preventDefault();
-                // placeholder for Google sign-in
-                window.location.hash = "dashboard";
+                signInWithPopup(auth, googleProvider)
+                  .then((result) => {
+                    window.location.hash = "dashboard";
+                  })
+                  .catch((error) => {
+                    alert(error.message || "Google sign-in failed");
+                  });
               }}
             >
               <i className="fab fa-google text-center"></i>

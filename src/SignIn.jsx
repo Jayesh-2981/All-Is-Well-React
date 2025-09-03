@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import { auth, googleProvider } from "./firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -7,9 +9,17 @@ export default function SignIn() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    // placeholder: wire Firebase auth here later
-    // on success redirect to dashboard
-    window.location.hash = "dashboard";
+    // Firebase email/password sign-in
+    const form = e.target;
+    const email = form.querySelector('input[type="email"]').value;
+    const password = form.querySelector('input[type="password"]').value;
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        window.location.hash = "dashboard";
+      })
+      .catch((error) => {
+        alert(error.message || "Sign-in failed");
+      });
   }
 
   return (
@@ -97,8 +107,13 @@ export default function SignIn() {
               className="btn btn-icon text-start btn-full btn-l font-600 font-13 bg-google rounded-s"
               onClick={(e) => {
                 e.preventDefault();
-                // placeholder for Google sign-in
-                window.location.hash = "dashboard";
+                signInWithPopup(auth, googleProvider)
+                  .then((result) => {
+                    window.location.hash = "dashboard";
+                  })
+                  .catch((error) => {
+                    alert(error.message || "Google sign-in failed");
+                  });
               }}
             >
               <i className="fab fa-google text-center"></i>
