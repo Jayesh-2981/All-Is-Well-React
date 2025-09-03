@@ -15,10 +15,15 @@ export default function SignIn() {
     const password = form.querySelector('input[type="password"]').value;
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        window.location.hash = "dashboard";
+        window.navigateTo("/dashboard");
       })
       .catch((error) => {
-        alert(error.message || "Sign-in failed");
+        console.error("signIn error", error);
+        window.showActionSheet(
+          "menu-warning-1",
+          `Sign-in failed ${error.code || ""}`,
+          error.message || "Sign-in failed"
+        );
       });
   }
 
@@ -71,7 +76,7 @@ export default function SignIn() {
                 }
               }}
             >
-              Create Account
+              Sign In
             </a>
           </form>
 
@@ -92,7 +97,7 @@ export default function SignIn() {
                 href="#register"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.hash = "register";
+                  window.navigateTo("/register");
                 }}
               >
                 Create account
@@ -109,10 +114,15 @@ export default function SignIn() {
                 e.preventDefault();
                 signInWithPopup(auth, googleProvider)
                   .then((result) => {
-                    window.location.hash = "dashboard";
+                    window.navigateTo("/dashboard");
                   })
                   .catch((error) => {
-                    alert(error.message || "Google sign-in failed");
+                    console.error("google sign-in error", error);
+                    window.showActionSheet(
+                      "menu-warning-1",
+                      "Google sign-in failed",
+                      error.message || "Google sign-in failed"
+                    );
                   });
               }}
             >

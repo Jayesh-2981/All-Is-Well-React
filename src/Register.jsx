@@ -26,17 +26,37 @@ export default function Register() {
                 confirmPassword: form.confirmPassword.value,
               };
               if (data.password !== data.confirmPassword) {
-                alert("Passwords do not match");
+                window.showActionSheet(
+                  "menu-warning-1",
+                  "Error",
+                  "Passwords do not match"
+                );
+                return;
+              }
+              // basic client-side password strength check (Firebase requires >= 6)
+              if (data.password.length < 6) {
+                window.showActionSheet(
+                  "menu-warning-1",
+                  "Weak password",
+                  "Password must be at least 6 characters long"
+                );
                 return;
               }
               // Firebase register
               createUserWithEmailAndPassword(auth, data.email, data.password)
                 .then((userCredential) => {
-                  // user created
-                  window.location.hash = "dashboard";
+                  // user created -> navigate to dashboard immediately
+                  window.navigateTo("/dashboard");
                 })
                 .catch((error) => {
-                  alert(error.message || "Registration failed");
+                  console.error("createUser error", error);
+                  const msg = (error && error.message) || "Registration failed";
+                  const code = (error && error.code) || "";
+                  window.showActionSheet(
+                    "notification-warning",
+                    `Registration failed ${code}`,
+                    msg
+                  );
                 });
             }}
           >
@@ -136,7 +156,7 @@ export default function Register() {
                 href="#signin"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.hash = "signin";
+                  window.navigateTo("/signin");
                 }}
               >
                 Sign In Here
@@ -153,10 +173,15 @@ export default function Register() {
                 e.preventDefault();
                 signInWithPopup(auth, googleProvider)
                   .then((result) => {
-                    window.location.hash = "dashboard";
+                    // match SignIn behavior: navigate immediately on success
+                    window.navigateTo("/dashboard");
                   })
                   .catch((error) => {
-                    alert(error.message || "Google sign-in failed");
+                    showActionSheet(
+                      "menu-warning-1",
+                      "Google sign-in failed",
+                      error.message || "Google sign-in failed"
+                    );
                   });
               }}
             >
